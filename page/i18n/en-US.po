@@ -1,0 +1,59 @@
+msgid "MON"
+msgstr "MO"
+
+msgid "TUE"
+msgstr "TU"
+
+msgid "WED"
+msgstr "WE"
+
+msgid "THU"
+msgstr "TH"
+
+msgid "FRI"
+msgstr "FR"
+
+msgid "SAT"
+msgstr "SA"
+
+msgid "SUN"
+msgstr "SU"
+
+msgid "JAN"
+msgstr "January"
+
+msgid "FEB"
+msgstr "February"
+
+msgid "MAR"
+msgstr "March"
+
+msgid "APR"
+msgstr "April"
+
+msgid "MAY"
+msgstr "May"
+
+msgid "JUN"
+msgstr "June"
+
+msgid "JUL"
+msgstr "July"
+
+msgid "AUG"
+msgstr "August"
+
+msgid "SEP"
+msgstr "September"
+
+msgid "OCT"
+msgstr "October"
+
+msgid "NOV"
+msgstr "November"
+
+msgid "DEC"
+msgstr "December"
+
+msgid "TODAY"
+msgstr "Today"

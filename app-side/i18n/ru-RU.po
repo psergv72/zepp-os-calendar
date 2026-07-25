@@ -1,0 +1,2 @@
+msgid "example"
+msgstr "app-side ru"
