@@ -15,7 +15,8 @@ import {
   GRID_LEFT,
   GRID_TOP,
 } from "zosLoader:./index.[pf].layout.js";
-import { ACCENT_COLOR } from "../utils/config/constants";
+import { ACCENT_COLOR, WEEKEND_COLOR, TEXT_COLOR, TEXT_COLOR_DIM } from "../utils/config/constants";
+import { getFirstDayOfWeek, getMonthName, getDayNames, getTodayText } from "../utils/locale";
 
 const logger = Logger.getLogger("calendar");
 const COL_COUNT = 7;
@@ -23,15 +24,11 @@ const CELL_COUNT = 42;
 
 let monthYearText;
 let todayCircle;
+let todayButton;
 const dayTexts = [];
 
 let currentYear;
 let currentMonth;
-
-const MONTHS = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-];
 
 Page({
   state: {},
@@ -40,9 +37,12 @@ Page({
     currentYear = now.getFullYear();
     currentMonth = now.getMonth();
 
+    const localeFirstDay = getFirstDayOfWeek();
+
     monthYearText = hmUI.createWidget(hmUI.widget.TEXT, {
       ...MONTH_YEAR,
       text: "Loading...",
+      color: WEEKEND_COLOR,
     });
 
     hmUI.createWidget(hmUI.widget.BUTTON, {
@@ -55,17 +55,21 @@ Page({
       click_func: () => this.navigateMonth(1),
     });
 
-    hmUI.createWidget(hmUI.widget.BUTTON, {
+    todayButton = hmUI.createWidget(hmUI.widget.BUTTON, {
       ...NAV_TODAY,
       click_func: () => this.goToToday(),
     });
+    todayButton.setProperty(hmUI.prop.TEXT, getTodayText());
 
-    const dayNames = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+    const dayNames = getDayNames();
     for (let i = 0; i < COL_COUNT; i++) {
+      const dayIndex = (i + localeFirstDay) % COL_COUNT;
+      const isWeekend = dayIndex === 0 || dayIndex === 6;
       hmUI.createWidget(hmUI.widget.TEXT, {
         ...WEEKDAY_PROPS,
         x: getWeekdayX(i),
-        text: dayNames[i],
+        text: dayNames[dayIndex],
+        color: isWeekend ? WEEKEND_COLOR : 0x888888,
       });
     }
 
@@ -94,7 +98,8 @@ Page({
   requestCalendar(year, month) {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDay = new Date(year, month, 1).getDay();
-    const startIdx = firstDay === 0 ? 6 : firstDay - 1;
+    const localeFirstDay = getFirstDayOfWeek();
+    const startIdx = (firstDay - localeFirstDay + 7) % 7;
     const prevDays = new Date(year, month, 0).getDate();
     const now = new Date();
     const cells = [];
@@ -124,25 +129,28 @@ Page({
     if (!data || !data.cells) return;
 
     const { year, month, cells } = data;
-    monthYearText.setProperty(hmUI.prop.TEXT, `${MONTHS[month] || "?"} ${year}`);
+    monthYearText.setProperty(hmUI.prop.TEXT, `${getMonthName(month)} ${year}`);
 
+    const localeFirstDay = getFirstDayOfWeek();
     let todayShown = false;
 
     for (let i = 0; i < CELL_COUNT; i++) {
       const cell = cells[i];
       const txt = dayTexts[i];
+      const col = i % COL_COUNT;
+      const dayOfWeek = (localeFirstDay + col) % 7;
+      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
       txt.setProperty(hmUI.prop.TEXT, String(cell.day));
 
       if (cell.isCurrentMonth) {
-        txt.setProperty(hmUI.prop.COLOR, 0xffffff);
+        txt.setProperty(hmUI.prop.COLOR, isWeekend ? WEEKEND_COLOR : TEXT_COLOR);
       } else {
-        txt.setProperty(hmUI.prop.COLOR, 0x444444);
+        txt.setProperty(hmUI.prop.COLOR, isWeekend ? 0x662222 : TEXT_COLOR_DIM);
       }
 
       if (cell.isToday) {
         todayShown = true;
         const row = Math.floor(i / COL_COUNT);
-        const col = i % COL_COUNT;
         todayCircle.setProperty(hmUI.prop.CENTER_X, GRID_LEFT + col * CELL_W + CELL_W / 2);
         todayCircle.setProperty(hmUI.prop.CENTER_Y, GRID_TOP + row * CELL_H + CELL_H / 2);
         todayCircle.setProperty(hmUI.prop.VISIBLE, true);
