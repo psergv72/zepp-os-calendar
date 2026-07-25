@@ -5,3 +5,5 @@ export const TEXT_COLOR_DIM = 0x666666;
 export const TODAY_BG_COLOR = 0xfc6950;
 export const WEEKEND_COLOR = 0xff6b6b;
 export const BG_COLOR = 0x000000;
+export const HOLIDAY_COLOR = 0xff4444;
+export const EVENT_DOT_COLOR = 0x4fc3f7;

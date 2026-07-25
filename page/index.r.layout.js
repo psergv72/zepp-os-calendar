@@ -77,15 +77,30 @@ export function getCellX(col) {
 }
 
 export function getCellY(row) {
-  return GRID_TOP + row * CELL_H + (CELL_H - px(34)) / 2;
+  return GRID_TOP + row * CELL_H + (CELL_H - 22) / 2;
 }
 
 export const CELL_TEXT_PROPS = (x, y) => ({
   x,
   y,
   w: px(36),
-  h: px(34),
-  text_size: px(24),
+  h: px(22),
+  text_size: px(22),
+  align_h: hmUI.align.CENTER_H,
+  align_v: hmUI.align.CENTER_V,
+  text_style: hmUI.text_style.NONE,
+});
+
+export function getDotY(row) {
+  return GRID_TOP + row * CELL_H + (CELL_H - 22) / 2 + 24;
+}
+
+export const DOT_TEXT_PROPS = (x, y) => ({
+  x,
+  y,
+  w: px(36),
+  h: px(8),
+  text_size: px(5),
   align_h: hmUI.align.CENTER_H,
   align_v: hmUI.align.CENTER_V,
   text_style: hmUI.text_style.NONE,
