@@ -2,15 +2,16 @@ import * as hmUI from "@zos/ui";
 import { px } from "@zos/utils";
 
 const COL_COUNT = 7;
+const DEVICE_H = 480;
 
 export const CELL_W = px(44);
 export const CELL_H = px(38);
 export const GRID_LEFT = px(86);
-export const GRID_TOP = px(145);
+export const GRID_TOP = px(Math.round(DEVICE_H * 0.33));
 
 export const MONTH_YEAR = {
   x: px(80),
-  y: px(40),
+  y: px(Math.round(DEVICE_H * 0.12)),
   w: px(320),
   h: px(50),
   color: 0xffffff,
@@ -21,33 +22,33 @@ export const MONTH_YEAR = {
 };
 
 export const NAV_PREV = {
-  x: px(30),
-  y: px(46),
-  w: px(60),
-  h: px(50),
-  text_size: px(36),
-  radius: px(8),
+  x: px(40),
+  y: px(Math.round(DEVICE_H * 0.50 - 18)),
+  w: px(40),
+  h: px(36),
+  text_size: px(24),
+  radius: px(6),
   normal_color: 0x333333,
   press_color: 0x555555,
   text: "<",
 };
 
 export const NAV_NEXT = {
-  x: px(390),
-  y: px(46),
-  w: px(60),
-  h: px(50),
-  text_size: px(36),
-  radius: px(8),
+  x: px(400),
+  y: px(Math.round(DEVICE_H * 0.50 - 18)),
+  w: px(40),
+  h: px(36),
+  text_size: px(24),
+  radius: px(6),
   normal_color: 0x333333,
   press_color: 0x555555,
   text: ">",
 };
 
 export const NAV_TODAY = {
-  x: px(180),
-  y: px(400),
-  w: px(120),
+  x: px(170),
+  y: px(Math.round(DEVICE_H * 0.87)),
+  w: px(140),
   h: px(40),
   text_size: px(22),
   radius: px(20),
@@ -61,7 +62,7 @@ export function getWeekdayX(index) {
 }
 
 export const WEEKDAY_PROPS = {
-  y: px(110),
+  y: px(Math.round(DEVICE_H * 0.26)),
   w: px(40),
   h: px(28),
   color: 0x888888,

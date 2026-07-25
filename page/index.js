@@ -29,8 +29,8 @@ let currentYear;
 let currentMonth;
 
 const MONTHS = [
-  "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
-  "JUL", "AUG", "SEP", "OCT", "NOV", "DEC",
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
 
 Page({
@@ -60,7 +60,7 @@ Page({
       click_func: () => this.goToToday(),
     });
 
-    const dayNames = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+    const dayNames = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
     for (let i = 0; i < COL_COUNT; i++) {
       hmUI.createWidget(hmUI.widget.TEXT, {
         ...WEEKDAY_PROPS,
@@ -68,6 +68,14 @@ Page({
         text: dayNames[i],
       });
     }
+
+    todayCircle = hmUI.createWidget(hmUI.widget.CIRCLE, {
+      center_x: 0,
+      center_y: 0,
+      radius: 16,
+      color: ACCENT_COLOR,
+      visible: false,
+    });
 
     for (let i = 0; i < CELL_COUNT; i++) {
       const row = Math.floor(i / COL_COUNT);
@@ -79,14 +87,6 @@ Page({
         })
       );
     }
-
-    todayCircle = hmUI.createWidget(hmUI.widget.CIRCLE, {
-      center_x: 0,
-      center_y: 0,
-      radius: 16,
-      color: ACCENT_COLOR,
-      visible: false,
-    });
 
     this.requestCalendar(currentYear, currentMonth);
   },
@@ -146,7 +146,7 @@ Page({
         todayCircle.setProperty(hmUI.prop.CENTER_X, GRID_LEFT + col * CELL_W + CELL_W / 2);
         todayCircle.setProperty(hmUI.prop.CENTER_Y, GRID_TOP + row * CELL_H + CELL_H / 2);
         todayCircle.setProperty(hmUI.prop.VISIBLE, true);
-        txt.setProperty(hmUI.prop.COLOR, 0x000000);
+        txt.setProperty(hmUI.prop.COLOR, 0xffffff);
       }
     }
 
