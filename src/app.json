@@ -5,8 +5,8 @@
     "appName": "Calendar",
     "appType": "app",
     "version": {
-      "code": 8,
-      "name": "0.2.8"
+      "code": 11,
+      "name": "0.2.11"
     },
     "icon": "icon.png",
     "vender": "zepp",
