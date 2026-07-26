@@ -66,33 +66,6 @@ function createLayout() {
   const fullInnerPct = 100 - marginPct * 2;
 
   if (IS_ROUND) {
-    const btnW = SAFE_PADDING - p * 2;
-    const btnH = DEVICE_HEIGHT - p * 2;
-
-    hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: p, y: p, w: btnW, h: btnH,
-      text: "<",
-      text_size: 28,
-      color: 0x444444,
-      normal_color: 0x000000,
-      press_color: 0x000000,
-      radius: 6,
-      click_func: () => PageInstance.navigateMonth(-1),
-    });
-
-    hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: DEVICE_WIDTH - btnW - p, y: p, w: btnW, h: btnH,
-      text: ">",
-      text_size: 28,
-      color: 0x444444,
-      normal_color: 0x000000,
-      press_color: 0x000000,
-      radius: 6,
-      click_func: () => PageInstance.navigateMonth(1),
-    });
-  }
-
-  if (IS_ROUND) {
     titleWidget = gui.text("", { text_size: 28 });
     gui.rowLayout(100);
   } else {
@@ -122,7 +95,7 @@ function createLayout() {
     gui.newRow();
     if (IS_ROUND) { gui.text(" ", { color: 0x000000, text_size: 1 }); }
     for (let col = 0; col < COL_COUNT; col++) {
-      cellWidgets.push(gui.text("", { text_size: 20, text_style: hmUI.text_style.NONE }));
+      cellWidgets.push(gui.text("", { text_size: 20, text_style: hmUI.text_style.MIDDLE }));
     }
     if (IS_ROUND) { gui.text(" ", { color: 0x000000, text_size: 1 }); }
     if (IS_ROUND) {
@@ -142,34 +115,6 @@ function createLayout() {
     gui.button(getTodayText(), () => PageInstance.goToToday(), { radius: 20, text_size: 22 });
   }
 
-  gui.render();
-
-  if (IS_ROUND) {
-    const p = 2;
-    const btnW = SAFE_PADDING - p * 2;
-    const btnH = DEVICE_HEIGHT - p * 2;
-    const prevMonth = () => PageInstance.navigateMonth(-1);
-    const nextMonth = () => PageInstance.navigateMonth(1);
-
-    navBtnLeft = hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: p, y: p, w: btnW, h: btnH,
-      text: "\u25C0",
-      normal_color: 0x000000,
-      press_color: 0x000000,
-      radius: 6,
-      click_func: prevMonth,
-    });
-
-    navBtnRight = hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: DEVICE_WIDTH - btnW - p, y: p, w: btnW, h: btnH,
-      text: "\u25B6",
-      normal_color: 0x000000,
-      press_color: 0x000000,
-      radius: 6,
-      click_func: nextMonth,
-    });
-  }
-
   todayCircle = hmUI.createWidget(hmUI.widget.CIRCLE, {
     center_x: 0,
     center_y: 0,
@@ -177,6 +122,40 @@ function createLayout() {
     color: ACCENT_COLOR,
     visible: false,
   });
+
+  gui.render();
+
+  if (IS_ROUND) {
+    const rowH = (DEVICE_HEIGHT - p * 2) / 9;
+    const gridY = p * 2 + rowH * 2;
+
+    const btnW = SAFE_PADDING - p * 4;
+    const btnH = rowH * 6;
+    const prevMonth = () => PageInstance.navigateMonth(-1);
+    const nextMonth = () => PageInstance.navigateMonth(1);
+
+    navBtnLeft = hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: p, y: gridY, w: btnW, h: btnH,
+      text: "<",
+      text_size: 28,
+      color: 0x444444,
+      normal_color: 0x000000,
+      press_color: 0x000000,
+      radius: 6,
+      click_func: prevMonth,
+    });
+
+    navBtnRight = hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: DEVICE_WIDTH - btnW - p, y: gridY, w: btnW, h: btnH,
+      text: ">",
+      text_size: 28,
+      color: 0x444444,
+      normal_color: 0x000000,
+      press_color: 0x000000,
+      radius: 6,
+      click_func: nextMonth,
+    });
+  }
 
   const rowH = (DEVICE_HEIGHT - p * 2) / 9;
   if (IS_ROUND) {
@@ -217,8 +196,10 @@ function updateDisplay(year, month, cells) {
 
   if (IS_ROUND) {
     const p = 2;
-    const btnW = SAFE_PADDING - p * 2;
-    const btnH = DEVICE_HEIGHT - p * 2;
+    const rowH = (DEVICE_HEIGHT - p * 2) / 9;
+    const gridY = p * 2 + rowH * 2;
+    const btnW = SAFE_PADDING - p * 4;
+    const btnH = rowH * 6;
     const prevMonth = () => PageInstance.navigateMonth(-1);
     const nextMonth = () => PageInstance.navigateMonth(1);
 
@@ -226,7 +207,7 @@ function updateDisplay(year, month, cells) {
     if (navBtnRight) { hmUI.deleteWidget(navBtnRight); }
 
     navBtnLeft = hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: p, y: p, w: btnW, h: btnH,
+      x: p, y: gridY, w: btnW, h: btnH,
       text: "<",
       text_size: 28,
       color: 0x444444,
@@ -237,7 +218,7 @@ function updateDisplay(year, month, cells) {
     });
 
     navBtnRight = hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: DEVICE_WIDTH - btnW - p, y: p, w: btnW, h: btnH,
+      x: DEVICE_WIDTH - btnW - p, y: gridY, w: btnW, h: btnH,
       text: ">",
       text_size: 28,
       color: 0x444444,
@@ -249,17 +230,10 @@ function updateDisplay(year, month, cells) {
   }
 
   const todayIdx = cells.findIndex(c => c.isToday);
-  if (todayIdx >= 0 && gui._layoutCache) {
-    const { p, rowH, cellW, gridY, gridStartX } = gui._layoutCache;
-    const col = todayIdx % COL_COUNT;
-    const week = Math.floor(todayIdx / COL_COUNT);
-
-    const cellCenterX = gridStartX != null
-      ? Math.round(gridStartX + col * cellW + cellW / 2)
-      : Math.round(p + col * cellW + cellW / 2);
-
-    todayCircle.setProperty(hmUI.prop.CENTER_X, cellCenterX);
-    todayCircle.setProperty(hmUI.prop.CENTER_Y, Math.round(gridY + week * rowH + (rowH - p * 2) / 2));
+  if (todayIdx >= 0) {
+    const tw = cellWidgets[todayIdx].widget;
+    todayCircle.setProperty(hmUI.prop.CENTER_X, Math.round(tw.getProperty(hmUI.prop.X) + tw.getProperty(hmUI.prop.W) / 2));
+    todayCircle.setProperty(hmUI.prop.CENTER_Y, Math.round(tw.getProperty(hmUI.prop.Y) + tw.getProperty(hmUI.prop.H) / 2));
     todayCircle.setProperty(hmUI.prop.VISIBLE, true);
   } else {
     todayCircle.setProperty(hmUI.prop.VISIBLE, false);
