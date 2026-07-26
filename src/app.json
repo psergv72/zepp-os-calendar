@@ -5,8 +5,8 @@
     "appName": "Calendar",
     "appType": "app",
     "version": {
-      "code": 1,
-      "name": "1.0.0"
+      "code": 4,
+      "name": "0.2.4"
     },
     "icon": "icon.png",
     "vender": "zepp",
@@ -48,8 +48,10 @@
       "appName": "Calendar"
     },
     "ru-RU": {
-      "appName": "Календарь"
+      "appName": "РљР°Р»РµРЅРґР°СЂСЊ"
     }
   },
   "defaultLanguage": "en-US"
 }
+
+
