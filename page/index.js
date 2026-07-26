@@ -1,6 +1,7 @@
 import * as hmUI from "@zos/ui";
 import VisLog from "@silver-zepp/vis-log";
-import AutoGUI, { DEVICE_WIDTH, DEVICE_HEIGHT } from "@silver-zepp/autogui";
+import AutoGUI from "@silver-zepp/autogui";
+import { DEVICE_WIDTH, DEVICE_HEIGHT, IS_ROUND, SAFE_PADDING } from "../utils/config/device";
 import { BasePage } from "@zeppos/zml/base-page";
 import { ACCENT_COLOR, WEEKEND_COLOR, TEXT_COLOR, TEXT_COLOR_DIM } from "../utils/config/constants";
 import { getFirstDayOfWeek, getMonthName, getDayNames, getTodayText } from "../utils/locale";
@@ -51,57 +52,141 @@ function computeCells(year, month) {
 
 function createLayout() {
   gui = new AutoGUI();
-  AutoGUI.SetPadding(2);
+
+  const p = 2;
+  AutoGUI.SetPadding(p);
   AutoGUI.SetColor(0x333333);
   AutoGUI.SetTextColor(0xffffff);
   AutoGUI.SetBtnRadius(6);
 
   const localeFirstDay = getFirstDayOfWeek();
   const dayNames = getDayNames();
+  const marginPct = IS_ROUND ? (SAFE_PADDING - p) / DEVICE_WIDTH * 100 : 0;
+  const colPct = (100 - marginPct * 2) / COL_COUNT;
+  const fullInnerPct = 100 - marginPct * 2;
 
-  gui.button("<", () => PageInstance.navigateMonth(-1), { text_size: 24 });
-  titleWidget = gui.text("", { text_size: 30 });
-  gui.button(">", () => PageInstance.navigateMonth(1), { text_size: 24 });
-  gui.rowLayout(15, 70, 15);
+  if (IS_ROUND) {
+    const btnW = SAFE_PADDING - p * 2;
+    const btnH = DEVICE_HEIGHT - p * 2;
+
+    hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: p, y: p, w: btnW, h: btnH,
+      text: "<",
+      text_size: 28,
+      color: 0x444444,
+      normal_color: 0x000000,
+      press_color: 0x000000,
+      radius: 6,
+      click_func: () => PageInstance.navigateMonth(-1),
+    });
+
+    hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: DEVICE_WIDTH - btnW - p, y: p, w: btnW, h: btnH,
+      text: ">",
+      text_size: 28,
+      color: 0x444444,
+      normal_color: 0x000000,
+      press_color: 0x000000,
+      radius: 6,
+      click_func: () => PageInstance.navigateMonth(1),
+    });
+  }
+
+  if (IS_ROUND) {
+    titleWidget = gui.text("", { text_size: 28 });
+    gui.rowLayout(100);
+  } else {
+    gui.button("<", () => PageInstance.navigateMonth(-1), { text_size: 24 });
+    titleWidget = gui.text("", { text_size: 30 });
+    gui.button(">", () => PageInstance.navigateMonth(1), { text_size: 24 });
+    gui.rowLayout(15, 70, 15);
+  }
 
   gui.newRow();
+  if (IS_ROUND) { gui.text(" ", { color: 0x000000, text_size: 1 }); }
   for (let i = 0; i < COL_COUNT; i++) {
     const dayIndex = (i + localeFirstDay) % COL_COUNT;
     gui.text(dayNames[dayIndex], {
       color: (dayIndex === 0 || dayIndex === 6) ? WEEKEND_COLOR : 0x888888,
-      text_size: 20,
+      text_size: 18,
     });
   }
-  gui.rowLayout(14.28, 14.28, 14.28, 14.28, 14.28, 14.28, 14.28);
-
-  for (let week = 0; week < 6; week++) {
-    gui.newRow();
-    for (let col = 0; col < COL_COUNT; col++) {
-      cellWidgets.push(gui.text("", { text_size: 24, text_style: hmUI.text_style.NONE }));
-    }
+  if (IS_ROUND) { gui.text(" ", { color: 0x000000, text_size: 1 }); }
+  if (IS_ROUND) {
+    gui.rowLayout(marginPct, ...Array(COL_COUNT).fill(colPct), marginPct);
+  } else {
     gui.rowLayout(14.28, 14.28, 14.28, 14.28, 14.28, 14.28, 14.28);
   }
 
+  for (let week = 0; week < 6; week++) {
+    gui.newRow();
+    if (IS_ROUND) { gui.text(" ", { color: 0x000000, text_size: 1 }); }
+    for (let col = 0; col < COL_COUNT; col++) {
+      cellWidgets.push(gui.text("", { text_size: 20, text_style: hmUI.text_style.NONE }));
+    }
+    if (IS_ROUND) { gui.text(" ", { color: 0x000000, text_size: 1 }); }
+    if (IS_ROUND) {
+      gui.rowLayout(marginPct, ...Array(COL_COUNT).fill(colPct), marginPct);
+    } else {
+      gui.rowLayout(14.28, 14.28, 14.28, 14.28, 14.28, 14.28, 14.28);
+    }
+  }
+
   gui.newRow();
-  gui.button(getTodayText(), () => PageInstance.goToToday(), { radius: 20, text_size: 22 });
+  if (IS_ROUND) {
+    gui.text(" ", { color: 0x000000, text_size: 1 });
+    gui.button(getTodayText(), () => PageInstance.goToToday(), { radius: 20, text_size: 20 });
+    gui.text(" ", { color: 0x000000, text_size: 1 });
+    gui.rowLayout(marginPct, fullInnerPct, marginPct);
+  } else {
+    gui.button(getTodayText(), () => PageInstance.goToToday(), { radius: 20, text_size: 22 });
+  }
 
   gui.render();
 
-  const p = AutoGUI.GetPadding();
-  const rowH = (DEVICE_HEIGHT - p * 2) / 9;
-  const cellW = (DEVICE_WIDTH - p * 2) / 7;
+  if (IS_ROUND) {
+    const p = 2;
+    const btnW = SAFE_PADDING - p * 2;
+    const btnH = DEVICE_HEIGHT - p * 2;
+    const prevMonth = () => PageInstance.navigateMonth(-1);
+    const nextMonth = () => PageInstance.navigateMonth(1);
+
+    navBtnLeft = hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: p, y: p, w: btnW, h: btnH,
+      text: "\u25C0",
+      normal_color: 0x000000,
+      press_color: 0x000000,
+      radius: 6,
+      click_func: prevMonth,
+    });
+
+    navBtnRight = hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: DEVICE_WIDTH - btnW - p, y: p, w: btnW, h: btnH,
+      text: "\u25B6",
+      normal_color: 0x000000,
+      press_color: 0x000000,
+      radius: 6,
+      click_func: nextMonth,
+    });
+  }
 
   todayCircle = hmUI.createWidget(hmUI.widget.CIRCLE, {
     center_x: 0,
     center_y: 0,
-    radius: 16,
+    radius: 14,
     color: ACCENT_COLOR,
     visible: false,
   });
 
-  gui.render();
-
-  gui._layoutCache = { p, rowH, cellW, gridY: p * 2 + rowH * 2 };
+  const rowH = (DEVICE_HEIGHT - p * 2) / 9;
+  if (IS_ROUND) {
+    const effectiveCellW = (DEVICE_WIDTH - p * 2) * (colPct / 100);
+    const gridStartX = p + (DEVICE_WIDTH - p * 2) * (marginPct / 100);
+    gui._layoutCache = { p, rowH, cellW: effectiveCellW, gridY: p * 2 + rowH * 2, gridStartX };
+  } else {
+    const cellW = (DEVICE_WIDTH - p * 2) / 7;
+    gui._layoutCache = { p, rowH, cellW, gridY: p * 2 + rowH * 2 };
+  }
 }
 
 function updateDisplay(year, month, cells) {
@@ -130,14 +215,51 @@ function updateDisplay(year, month, cells) {
 
   gui.render(true);
 
+  if (IS_ROUND) {
+    const p = 2;
+    const btnW = SAFE_PADDING - p * 2;
+    const btnH = DEVICE_HEIGHT - p * 2;
+    const prevMonth = () => PageInstance.navigateMonth(-1);
+    const nextMonth = () => PageInstance.navigateMonth(1);
+
+    if (navBtnLeft) { hmUI.deleteWidget(navBtnLeft); }
+    if (navBtnRight) { hmUI.deleteWidget(navBtnRight); }
+
+    navBtnLeft = hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: p, y: p, w: btnW, h: btnH,
+      text: "<",
+      text_size: 28,
+      color: 0x444444,
+      normal_color: 0x000000,
+      press_color: 0x000000,
+      radius: 6,
+      click_func: prevMonth,
+    });
+
+    navBtnRight = hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: DEVICE_WIDTH - btnW - p, y: p, w: btnW, h: btnH,
+      text: ">",
+      text_size: 28,
+      color: 0x444444,
+      normal_color: 0x000000,
+      press_color: 0x000000,
+      radius: 6,
+      click_func: nextMonth,
+    });
+  }
+
   const todayIdx = cells.findIndex(c => c.isToday);
   if (todayIdx >= 0 && gui._layoutCache) {
-    const { p, rowH, cellW, gridY } = gui._layoutCache;
+    const { p, rowH, cellW, gridY, gridStartX } = gui._layoutCache;
     const col = todayIdx % COL_COUNT;
     const week = Math.floor(todayIdx / COL_COUNT);
 
-    todayCircle.setProperty(hmUI.prop.CENTER_X, Math.round(p + col * cellW + cellW / 2));
-    todayCircle.setProperty(hmUI.prop.CENTER_Y, Math.round(gridY + week * rowH + rowH / 2));
+    const cellCenterX = gridStartX != null
+      ? Math.round(gridStartX + col * cellW + cellW / 2)
+      : Math.round(p + col * cellW + cellW / 2);
+
+    todayCircle.setProperty(hmUI.prop.CENTER_X, cellCenterX);
+    todayCircle.setProperty(hmUI.prop.CENTER_Y, Math.round(gridY + week * rowH + (rowH - p * 2) / 2));
     todayCircle.setProperty(hmUI.prop.VISIBLE, true);
   } else {
     todayCircle.setProperty(hmUI.prop.VISIBLE, false);
@@ -145,6 +267,8 @@ function updateDisplay(year, month, cells) {
 }
 
 let PageInstance;
+let navBtnLeft;
+let navBtnRight;
 
 Page(BasePage({
   state: {},
