@@ -5,8 +5,8 @@
     "appName": "Calendar",
     "appType": "app",
     "version": {
-      "code": 11,
-      "name": "0.2.11"
+      "code": 12,
+      "name": "0.2.12"
     },
     "icon": "icon.png",
     "vender": "zepp",
@@ -23,7 +23,7 @@
       "minVersion": "4.0"
     }
   },
-  "debug": false,
+  "debug": true,
   "targets": {
     "gt": {
       "module": {
