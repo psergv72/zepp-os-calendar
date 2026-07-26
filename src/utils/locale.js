@@ -11,6 +11,9 @@ const RU_MONTHS = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', '
 const RU_DAYS = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб']
 
 let cachedLocale = null
+let monthNamesCache = null
+let dayNamesCache = null
+let todayTextCache = null
 
 function hasCyrillic(str) {
   return /[а-яА-ЯёЁ]/.test(str)
@@ -38,6 +41,24 @@ function getLocale() {
   return cachedLocale
 }
 
+function buildCaches() {
+  if (monthNamesCache) return
+
+  const loc = getLocale()
+
+  const sysMonths = MONTH_KEYS.map(k => {
+    const t = getText(k)
+    return (t && t !== k) ? to3title(t) : null
+  })
+  monthNamesCache = sysMonths[0] ? sysMonths : loc.months
+
+  const sysDays = DAY_KEYS.map(k => toTitleFirst(getText(k)))
+  dayNamesCache = (sysDays[0] && sysDays[0].toUpperCase() !== DAY_KEYS[0]) ? sysDays : loc.days
+
+  const sysToday = getText('TODAY')
+  todayTextCache = (sysToday && sysToday !== 'TODAY') ? sysToday : loc.today
+}
+
 export function getFirstDayOfWeek() {
   return getLocale().firstDay
 }
@@ -53,19 +74,16 @@ function to3title(str) {
 }
 
 export function getMonthName(monthIndex) {
-  const t = getText(MONTH_KEYS[monthIndex])
-  if (t && t !== MONTH_KEYS[monthIndex]) return to3title(t)
-  return getLocale().months[monthIndex]
+  buildCaches()
+  return monthNamesCache[monthIndex]
 }
 
 export function getDayNames() {
-  const t = DAY_KEYS.map((k) => toTitleFirst(getText(k)))
-  if (t[0] && t[0].toUpperCase() !== DAY_KEYS[0]) return t
-  return getLocale().days
+  buildCaches()
+  return dayNamesCache
 }
 
 export function getTodayText() {
-  const t = getText('TODAY')
-  if (t && t !== 'TODAY') return t
-  return getLocale().today
+  buildCaches()
+  return todayTextCache
 }

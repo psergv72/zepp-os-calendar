@@ -5,8 +5,8 @@
     "appName": "Calendar",
     "appType": "app",
     "version": {
-      "code": 26,
-      "name": "0.2.26"
+      "code": 31,
+      "name": "0.2.31"
     },
     "icon": "icon.png",
     "vender": "zepp",
@@ -48,7 +48,7 @@
       "appName": "Calendar"
     },
     "ru-RU": {
-      "appName": "Р С™Р В°Р В»Р ВµР Р…Р Т‘Р В°РЎР‚РЎРЉ"
+      "appName": "Р В Р’В Р РЋРІвЂћСћР В Р’В Р вЂ™Р’В°Р В Р’В Р вЂ™Р’В»Р В Р’В Р вЂ™Р’ВµР В Р’В Р В РІР‚В¦Р В Р’В Р СћРІР‚ВР В Р’В Р вЂ™Р’В°Р В Р Р‹Р В РІР‚С™Р В Р Р‹Р В Р вЂ°"
     }
   },
   "defaultLanguage": "en-US"

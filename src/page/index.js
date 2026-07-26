@@ -10,6 +10,7 @@ const vis = new VisLog("calendar");
 vis.updateSettings({ line_count: 3, text_size: 16, timeout_enabled: true, visual_log_enabled: false });
 
 const COL_COUNT = 7;
+const ROW_PCTS = [14.28, 14.28, 14.28, 14.28, 14.28, 14.28, 14.28];
 
 let currentYear;
 let currentMonth;
@@ -17,35 +18,37 @@ let titleWidget;
 const cellWidgets = [];
 let todayCircle;
 let gui;
+let localeFirstDay;
+let isWeekendCol;
+let navBtnLeft;
+let navBtnRight;
 
 function computeCells(year, month) {
+  const monthStart = new Date(year, month, 1);
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDay = new Date(year, month, 1).getDay();
-  const localeFirstDay = getFirstDayOfWeek();
+  const firstDay = monthStart.getDay();
   const startIdx = (firstDay - localeFirstDay + 7) % 7;
   const prevDays = new Date(year, month, 0).getDate();
   const now = new Date();
+  const nowY = now.getFullYear();
+  const nowM = now.getMonth();
+  const nowD = now.getDate();
   const cells = [];
+  let todayCell = null;
 
   for (let i = 0; i < 42; i++) {
-    let day, isCurrentMonth, isToday;
     if (i < startIdx) {
-      day = prevDays - startIdx + i + 1;
-      isCurrentMonth = false;
-      isToday = false;
+      cells.push({ day: prevDays - startIdx + i + 1, isCurrentMonth: false, isToday: false });
     } else if (i >= startIdx + daysInMonth) {
-      day = i - startIdx - daysInMonth + 1;
-      isCurrentMonth = false;
-      isToday = false;
+      cells.push({ day: i - startIdx - daysInMonth + 1, isCurrentMonth: false, isToday: false });
     } else {
-      day = i - startIdx + 1;
-      isCurrentMonth = true;
-      isToday = now.getFullYear() === year && now.getMonth() === month && now.getDate() === day;
+      const day = i - startIdx + 1;
+      const isToday = year === nowY && month === nowM && day === nowD;
+      cells.push({ day, isCurrentMonth: true, isToday });
+      if (isToday) todayCell = cells[i];
     }
-    cells.push({ day, isCurrentMonth, isToday });
   }
 
-  const todayCell = cells.find(c => c.isToday);
   vis.debug(`${daysInMonth} days, ${startIdx} offset` + (todayCell ? `, today=${todayCell.day}` : ""));
   return cells;
 }
@@ -59,11 +62,11 @@ function createLayout() {
   AutoGUI.SetTextColor(0xffffff);
   AutoGUI.SetBtnRadius(6);
 
-  const localeFirstDay = getFirstDayOfWeek();
   const dayNames = getDayNames();
   const marginPct = IS_ROUND ? (SAFE_PADDING - p) / DEVICE_WIDTH * 100 : 0;
   const colPct = (100 - marginPct * 2) / COL_COUNT;
   const fullInnerPct = 100 - marginPct * 2;
+  const roundRowPcts = IS_ROUND ? [marginPct, colPct, colPct, colPct, colPct, colPct, colPct, colPct, marginPct] : null;
 
   if (IS_ROUND) {
     titleWidget = gui.text("", { text_size: 41 });
@@ -78,17 +81,16 @@ function createLayout() {
   gui.newRow();
   if (IS_ROUND) { gui.text(" ", { color: 0x000000, text_size: 1 }); }
   for (let i = 0; i < COL_COUNT; i++) {
-    const dayIndex = (i + localeFirstDay) % COL_COUNT;
-    gui.text(dayNames[dayIndex], {
-      color: (dayIndex === 0 || dayIndex === 6) ? WEEKEND_COLOR : 0x888888,
+    gui.text(dayNames[i], {
+      color: isWeekendCol[i] ? WEEKEND_COLOR : 0x888888,
       text_size: 26,
     });
   }
   if (IS_ROUND) { gui.text(" ", { color: 0x000000, text_size: 1 }); }
   if (IS_ROUND) {
-    gui.rowLayout(marginPct, ...Array(COL_COUNT).fill(colPct), marginPct);
+    gui.rowLayout(...roundRowPcts);
   } else {
-    gui.rowLayout(14.28, 14.28, 14.28, 14.28, 14.28, 14.28, 14.28);
+    gui.rowLayout(...ROW_PCTS);
   }
 
   for (let week = 0; week < 6; week++) {
@@ -99,9 +101,9 @@ function createLayout() {
     }
     if (IS_ROUND) { gui.text(" ", { color: 0x000000, text_size: 1 }); }
     if (IS_ROUND) {
-      gui.rowLayout(marginPct, ...Array(COL_COUNT).fill(colPct), marginPct);
+      gui.rowLayout(...roundRowPcts);
     } else {
-      gui.rowLayout(14.28, 14.28, 14.28, 14.28, 14.28, 14.28, 14.28);
+      gui.rowLayout(...ROW_PCTS);
     }
   }
 
@@ -125,15 +127,13 @@ function createLayout() {
 
   gui.render();
 
-  if (IS_ROUND) {
-    const rowH = (DEVICE_HEIGHT - p * 2) / 9;
+  const rowH = (DEVICE_HEIGHT - p * 2) / 9;
 
+  if (IS_ROUND) {
     const btnW = SAFE_PADDING - p * 8;
     const btnH = rowH * 9;
-    const prevMonth = () => PageInstance.navigateMonth(-1);
-    const nextMonth = () => PageInstance.navigateMonth(1);
 
-    navBtnLeft = hmUI.createWidget(hmUI.widget.BUTTON, {
+    hmUI.createWidget(hmUI.widget.BUTTON, {
       x: p, y: p * 2, w: btnW, h: btnH,
       text: "<",
       text_size: 41,
@@ -141,10 +141,10 @@ function createLayout() {
       normal_color: 0x000000,
       press_color: 0x555555,
       radius: 6,
-      click_func: prevMonth,
+      click_func: () => PageInstance.navigateMonth(-1),
     });
 
-    navBtnRight = hmUI.createWidget(hmUI.widget.BUTTON, {
+    hmUI.createWidget(hmUI.widget.BUTTON, {
       x: DEVICE_WIDTH - btnW - p, y: p * 2, w: btnW, h: btnH,
       text: ">",
       text_size: 41,
@@ -152,12 +152,9 @@ function createLayout() {
       normal_color: 0x000000,
       press_color: 0x555555,
       radius: 6,
-      click_func: nextMonth,
+      click_func: () => PageInstance.navigateMonth(1),
     });
-  }
 
-  const rowH = (DEVICE_HEIGHT - p * 2) / 9;
-  if (IS_ROUND) {
     const effectiveCellW = (DEVICE_WIDTH - p * 2) * (colPct / 100);
     const gridStartX = p + (DEVICE_WIDTH - p * 2) * (marginPct / 100);
     gui._layoutCache = { p, rowH, cellW: effectiveCellW, gridY: p * 2 + rowH * 2, gridStartX };
@@ -168,28 +165,29 @@ function createLayout() {
 }
 
 function updateDisplay(year, month, cells) {
-  const localeFirstDay = getFirstDayOfWeek();
-  const isCurrentMonth = cells.some(c => c.isToday);
-
   titleWidget.properties.text = `${getMonthName(month)} ${year}`;
-  titleWidget.properties.color = isCurrentMonth ? WEEKEND_COLOR : TEXT_COLOR;
+
+  let todayIdx = -1;
+  let hasToday = false;
 
   for (let i = 0; i < 42; i++) {
     const cell = cells[i];
-    const col = i % COL_COUNT;
-    const dayOfWeek = (localeFirstDay + col) % COL_COUNT;
-    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+    const isWeekend = isWeekendCol[i % 7];
 
     cellWidgets[i].properties.text = String(cell.day);
 
     if (cell.isToday) {
       cellWidgets[i].properties.color = 0xffffff;
+      todayIdx = i;
+      hasToday = true;
     } else if (cell.isCurrentMonth) {
       cellWidgets[i].properties.color = isWeekend ? WEEKEND_COLOR : TEXT_COLOR;
     } else {
       cellWidgets[i].properties.color = isWeekend ? 0x662222 : TEXT_COLOR_DIM;
     }
   }
+
+  titleWidget.properties.color = hasToday ? WEEKEND_COLOR : TEXT_COLOR;
 
   gui.render(true);
 
@@ -198,8 +196,6 @@ function updateDisplay(year, month, cells) {
     const rowH = (DEVICE_HEIGHT - p * 2) / 9;
     const btnW = SAFE_PADDING - p * 8;
     const btnH = rowH * 9;
-    const prevMonth = () => PageInstance.navigateMonth(-1);
-    const nextMonth = () => PageInstance.navigateMonth(1);
 
     if (navBtnLeft) { hmUI.deleteWidget(navBtnLeft); }
     if (navBtnRight) { hmUI.deleteWidget(navBtnRight); }
@@ -212,7 +208,7 @@ function updateDisplay(year, month, cells) {
       normal_color: 0x000000,
       press_color: 0x555555,
       radius: 6,
-      click_func: prevMonth,
+      click_func: () => PageInstance.navigateMonth(-1),
     });
 
     navBtnRight = hmUI.createWidget(hmUI.widget.BUTTON, {
@@ -223,11 +219,10 @@ function updateDisplay(year, month, cells) {
       normal_color: 0x000000,
       press_color: 0x555555,
       radius: 6,
-      click_func: nextMonth,
+      click_func: () => PageInstance.navigateMonth(1),
     });
   }
 
-  const todayIdx = cells.findIndex(c => c.isToday);
   if (todayIdx >= 0) {
     const tw = cellWidgets[todayIdx].widget;
     todayCircle.setProperty(hmUI.prop.CENTER_X, Math.round(tw.getProperty(hmUI.prop.X) + tw.getProperty(hmUI.prop.W) / 2));
@@ -239,13 +234,16 @@ function updateDisplay(year, month, cells) {
 }
 
 let PageInstance;
-let navBtnLeft;
-let navBtnRight;
 
 Page(BasePage({
   state: {},
   build() {
     PageInstance = this;
+    localeFirstDay = getFirstDayOfWeek();
+    isWeekendCol = [];
+    for (let c = 0; c < 7; c++) {
+      isWeekendCol[c] = (localeFirstDay + c) % 7 === 0 || (localeFirstDay + c) % 7 === 6;
+    }
     const now = new Date();
     currentYear = now.getFullYear();
     currentMonth = now.getMonth();
