@@ -1,10 +1,10 @@
 import * as hmUI from "@zos/ui";
 import VisLog from "@silver-zepp/vis-log";
 import AutoGUI from "@silver-zepp/autogui";
-import { DEVICE_WIDTH, DEVICE_HEIGHT, IS_ROUND, SAFE_PADDING } from "../../utils/config/device";
+import { DEVICE_WIDTH, DEVICE_HEIGHT, IS_ROUND, SAFE_PADDING } from "../utils/config/device";
 import { BasePage } from "@zeppos/zml/base-page";
-import { ACCENT_COLOR, WEEKEND_COLOR, TEXT_COLOR, TEXT_COLOR_DIM } from "../../utils/config/constants";
-import { getFirstDayOfWeek, getMonthName, getDayNames, getTodayText } from "../../utils/locale";
+import { ACCENT_COLOR, WEEKEND_COLOR, TEXT_COLOR, TEXT_COLOR_DIM } from "../utils/config/constants";
+import { getFirstDayOfWeek, getMonthName, getDayNames, getTodayText } from "../utils/locale";
 
 const vis = new VisLog("calendar");
 vis.updateSettings({ line_count: 3, text_size: 14, timeout_enabled: true, visual_log_enabled: false });

@@ -1,12 +1,12 @@
-{
+﻿{
   "configVersion": "v3",
   "app": {
     "appId": 27252,
     "appName": "Calendar",
     "appType": "app",
     "version": {
-      "code": 12,
-      "name": "0.2.12"
+      "code": 4,
+      "name": "0.2.4"
     },
     "icon": "icon.png",
     "vender": "zepp",
@@ -23,13 +23,12 @@
       "minVersion": "4.0"
     }
   },
-  "debug": true,
   "targets": {
-    "gt": {
+    "common": {
       "module": {
         "page": {
           "pages": [
-            "page/home/index.page"
+            "page/index"
           ]
         },
         "app-side": {
