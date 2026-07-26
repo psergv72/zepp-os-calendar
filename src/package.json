@@ -1,6 +1,6 @@
 {
   "name": "fetch",
-  "version": "0.2.4",
+  "version": "0.2.8",
   "description": "",
   "main": "app.js",
   "scripts": {
