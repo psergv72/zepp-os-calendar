@@ -1,4 +1,6 @@
-AppSideService({
+import { BaseSideService } from "@zeppos/zml/base-side";
+
+AppSideService(BaseSideService({
   onInit() {},
   onRequest(req, res) {
     if (req.method === "GET_CALENDAR") {
@@ -34,4 +36,4 @@ AppSideService({
   },
   onRun() {},
   onDestroy() {},
-});
+}));

@@ -13,7 +13,8 @@
     "description": "Calendar app with month view and sync"
   },
   "permissions": [
-    "device:os.local_storage"
+    "device:os.local_storage",
+    "data:os.device.info"
   ],
   "runtime": {
     "apiVersion": {
