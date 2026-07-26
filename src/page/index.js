@@ -127,31 +127,30 @@ function createLayout() {
 
   if (IS_ROUND) {
     const rowH = (DEVICE_HEIGHT - p * 2) / 9;
-    const gridY = p * 2 + rowH * 2;
 
     const btnW = SAFE_PADDING - p * 4;
-    const btnH = rowH * 6;
+    const btnH = rowH * 9;
     const prevMonth = () => PageInstance.navigateMonth(-1);
     const nextMonth = () => PageInstance.navigateMonth(1);
 
     navBtnLeft = hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: p, y: gridY, w: btnW, h: btnH,
+      x: p, y: p * 2, w: btnW, h: btnH,
       text: "<",
       text_size: 28,
-      color: 0x444444,
+      color: 0x666666,
       normal_color: 0x000000,
-      press_color: 0x000000,
+      press_color: 0x555555,
       radius: 6,
       click_func: prevMonth,
     });
 
     navBtnRight = hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: DEVICE_WIDTH - btnW - p, y: gridY, w: btnW, h: btnH,
+      x: DEVICE_WIDTH - btnW - p, y: p * 2, w: btnW, h: btnH,
       text: ">",
       text_size: 28,
-      color: 0x444444,
+      color: 0x666666,
       normal_color: 0x000000,
-      press_color: 0x000000,
+      press_color: 0x555555,
       radius: 6,
       click_func: nextMonth,
     });
@@ -197,9 +196,8 @@ function updateDisplay(year, month, cells) {
   if (IS_ROUND) {
     const p = 2;
     const rowH = (DEVICE_HEIGHT - p * 2) / 9;
-    const gridY = p * 2 + rowH * 2;
     const btnW = SAFE_PADDING - p * 4;
-    const btnH = rowH * 6;
+    const btnH = rowH * 9;
     const prevMonth = () => PageInstance.navigateMonth(-1);
     const nextMonth = () => PageInstance.navigateMonth(1);
 
@@ -207,23 +205,23 @@ function updateDisplay(year, month, cells) {
     if (navBtnRight) { hmUI.deleteWidget(navBtnRight); }
 
     navBtnLeft = hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: p, y: gridY, w: btnW, h: btnH,
+      x: p, y: p * 2, w: btnW, h: btnH,
       text: "<",
       text_size: 28,
-      color: 0x444444,
+      color: 0x666666,
       normal_color: 0x000000,
-      press_color: 0x000000,
+      press_color: 0x555555,
       radius: 6,
       click_func: prevMonth,
     });
 
     navBtnRight = hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: DEVICE_WIDTH - btnW - p, y: gridY, w: btnW, h: btnH,
+      x: DEVICE_WIDTH - btnW - p, y: p * 2, w: btnW, h: btnH,
       text: ">",
       text_size: 28,
-      color: 0x444444,
+      color: 0x666666,
       normal_color: 0x000000,
-      press_color: 0x000000,
+      press_color: 0x555555,
       radius: 6,
       click_func: nextMonth,
     });

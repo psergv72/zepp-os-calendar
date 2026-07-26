@@ -1,12 +1,12 @@
-﻿{
+{
   "configVersion": "v3",
   "app": {
     "appId": 27252,
     "appName": "Calendar",
     "appType": "app",
     "version": {
-      "code": 4,
-      "name": "0.2.4"
+      "code": 17,
+      "name": "0.2.17"
     },
     "icon": "icon.png",
     "vender": "zepp",
@@ -48,7 +48,7 @@
       "appName": "Calendar"
     },
     "ru-RU": {
-      "appName": "Календарь"
+      "appName": "Р С™Р В°Р В»Р ВµР Р…Р Т‘Р В°РЎР‚РЎРЉ"
     }
   },
   "defaultLanguage": "en-US"
