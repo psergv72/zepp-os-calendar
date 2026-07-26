@@ -7,7 +7,7 @@ import { ACCENT_COLOR, WEEKEND_COLOR, TEXT_COLOR, TEXT_COLOR_DIM } from "../util
 import { getFirstDayOfWeek, getMonthName, getDayNames, getTodayText } from "../utils/locale";
 
 const vis = new VisLog("calendar");
-vis.updateSettings({ line_count: 3, text_size: 14, timeout_enabled: true, visual_log_enabled: false });
+vis.updateSettings({ line_count: 3, text_size: 16, timeout_enabled: true, visual_log_enabled: false });
 
 const COL_COUNT = 7;
 
@@ -66,12 +66,12 @@ function createLayout() {
   const fullInnerPct = 100 - marginPct * 2;
 
   if (IS_ROUND) {
-    titleWidget = gui.text("", { text_size: 28 });
+    titleWidget = gui.text("", { text_size: 41 });
     gui.rowLayout(100);
   } else {
-    gui.button("<", () => PageInstance.navigateMonth(-1), { text_size: 24 });
-    titleWidget = gui.text("", { text_size: 30 });
-    gui.button(">", () => PageInstance.navigateMonth(1), { text_size: 24 });
+    gui.button("<", () => PageInstance.navigateMonth(-1), { text_size: 36 });
+    titleWidget = gui.text("", { text_size: 45 });
+    gui.button(">", () => PageInstance.navigateMonth(1), { text_size: 36 });
     gui.rowLayout(15, 70, 15);
   }
 
@@ -81,7 +81,7 @@ function createLayout() {
     const dayIndex = (i + localeFirstDay) % COL_COUNT;
     gui.text(dayNames[dayIndex], {
       color: (dayIndex === 0 || dayIndex === 6) ? WEEKEND_COLOR : 0x888888,
-      text_size: 18,
+      text_size: 26,
     });
   }
   if (IS_ROUND) { gui.text(" ", { color: 0x000000, text_size: 1 }); }
@@ -95,7 +95,7 @@ function createLayout() {
     gui.newRow();
     if (IS_ROUND) { gui.text(" ", { color: 0x000000, text_size: 1 }); }
     for (let col = 0; col < COL_COUNT; col++) {
-      cellWidgets.push(gui.text("", { text_size: 20, text_style: hmUI.text_style.MIDDLE }));
+      cellWidgets.push(gui.text("", { text_size: 30, text_style: hmUI.text_style.MIDDLE }));
     }
     if (IS_ROUND) { gui.text(" ", { color: 0x000000, text_size: 1 }); }
     if (IS_ROUND) {
@@ -108,17 +108,17 @@ function createLayout() {
   gui.newRow();
   if (IS_ROUND) {
     gui.text(" ", { color: 0x000000, text_size: 1 });
-    gui.button(getTodayText(), () => PageInstance.goToToday(), { radius: 20, text_size: 20 });
+    gui.button(getTodayText(), () => PageInstance.goToToday(), { radius: 20, text_size: 30 });
     gui.text(" ", { color: 0x000000, text_size: 1 });
     gui.rowLayout(marginPct, fullInnerPct, marginPct);
   } else {
-    gui.button(getTodayText(), () => PageInstance.goToToday(), { radius: 20, text_size: 22 });
+    gui.button(getTodayText(), () => PageInstance.goToToday(), { radius: 20, text_size: 33 });
   }
 
   todayCircle = hmUI.createWidget(hmUI.widget.CIRCLE, {
     center_x: 0,
     center_y: 0,
-    radius: 14,
+    radius: 21,
     color: ACCENT_COLOR,
     visible: false,
   });
@@ -128,7 +128,7 @@ function createLayout() {
   if (IS_ROUND) {
     const rowH = (DEVICE_HEIGHT - p * 2) / 9;
 
-    const btnW = SAFE_PADDING - p * 4;
+    const btnW = SAFE_PADDING - p * 8;
     const btnH = rowH * 9;
     const prevMonth = () => PageInstance.navigateMonth(-1);
     const nextMonth = () => PageInstance.navigateMonth(1);
@@ -136,7 +136,7 @@ function createLayout() {
     navBtnLeft = hmUI.createWidget(hmUI.widget.BUTTON, {
       x: p, y: p * 2, w: btnW, h: btnH,
       text: "<",
-      text_size: 28,
+      text_size: 41,
       color: 0x666666,
       normal_color: 0x000000,
       press_color: 0x555555,
@@ -147,7 +147,7 @@ function createLayout() {
     navBtnRight = hmUI.createWidget(hmUI.widget.BUTTON, {
       x: DEVICE_WIDTH - btnW - p, y: p * 2, w: btnW, h: btnH,
       text: ">",
-      text_size: 28,
+      text_size: 41,
       color: 0x666666,
       normal_color: 0x000000,
       press_color: 0x555555,
@@ -196,7 +196,7 @@ function updateDisplay(year, month, cells) {
   if (IS_ROUND) {
     const p = 2;
     const rowH = (DEVICE_HEIGHT - p * 2) / 9;
-    const btnW = SAFE_PADDING - p * 4;
+    const btnW = SAFE_PADDING - p * 8;
     const btnH = rowH * 9;
     const prevMonth = () => PageInstance.navigateMonth(-1);
     const nextMonth = () => PageInstance.navigateMonth(1);
@@ -207,7 +207,7 @@ function updateDisplay(year, month, cells) {
     navBtnLeft = hmUI.createWidget(hmUI.widget.BUTTON, {
       x: p, y: p * 2, w: btnW, h: btnH,
       text: "<",
-      text_size: 28,
+      text_size: 41,
       color: 0x666666,
       normal_color: 0x000000,
       press_color: 0x555555,
@@ -218,7 +218,7 @@ function updateDisplay(year, month, cells) {
     navBtnRight = hmUI.createWidget(hmUI.widget.BUTTON, {
       x: DEVICE_WIDTH - btnW - p, y: p * 2, w: btnW, h: btnH,
       text: ">",
-      text_size: 28,
+      text_size: 41,
       color: 0x666666,
       normal_color: 0x000000,
       press_color: 0x555555,
