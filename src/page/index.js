@@ -23,36 +23,6 @@ let isWeekendCol;
 let navBtnLeft;
 let navBtnRight;
 
-function computeCells(year, month) {
-  const monthStart = new Date(year, month, 1);
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDay = monthStart.getDay();
-  const startIdx = (firstDay - localeFirstDay + 7) % 7;
-  const prevDays = new Date(year, month, 0).getDate();
-  const now = new Date();
-  const nowY = now.getFullYear();
-  const nowM = now.getMonth();
-  const nowD = now.getDate();
-  const cells = [];
-  let todayCell = null;
-
-  for (let i = 0; i < 42; i++) {
-    if (i < startIdx) {
-      cells.push({ day: prevDays - startIdx + i + 1, isCurrentMonth: false, isToday: false });
-    } else if (i >= startIdx + daysInMonth) {
-      cells.push({ day: i - startIdx - daysInMonth + 1, isCurrentMonth: false, isToday: false });
-    } else {
-      const day = i - startIdx + 1;
-      const isToday = year === nowY && month === nowM && day === nowD;
-      cells.push({ day, isCurrentMonth: true, isToday });
-      if (isToday) todayCell = cells[i];
-    }
-  }
-
-  vis.debug(`${daysInMonth} days, ${startIdx} offset` + (todayCell ? `, today=${todayCell.day}` : ""));
-  return cells;
-}
-
 function createLayout() {
   gui = new AutoGUI();
 
@@ -164,23 +134,46 @@ function createLayout() {
   }
 }
 
-function updateDisplay(year, month, cells) {
+function updateDisplay(year, month) {
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay();
+  const startIdx = (firstDay - localeFirstDay + 7) % 7;
+  const prevDays = new Date(year, month, 0).getDate();
+  const now = new Date();
+  const nowY = now.getFullYear();
+  const nowM = now.getMonth();
+  const nowD = now.getDate();
+
   titleWidget.properties.text = `${getMonthName(month)} ${year}`;
 
   let todayIdx = -1;
   let hasToday = false;
 
   for (let i = 0; i < 42; i++) {
-    const cell = cells[i];
+    let day, isCurrentMonth, isToday;
+    if (i < startIdx) {
+      day = prevDays - startIdx + i + 1;
+      isCurrentMonth = false;
+      isToday = false;
+    } else if (i >= startIdx + daysInMonth) {
+      day = i - startIdx - daysInMonth + 1;
+      isCurrentMonth = false;
+      isToday = false;
+    } else {
+      day = i - startIdx + 1;
+      isCurrentMonth = true;
+      isToday = year === nowY && month === nowM && day === nowD;
+    }
+
     const isWeekend = isWeekendCol[i % 7];
 
-    cellWidgets[i].properties.text = String(cell.day);
+    cellWidgets[i].properties.text = String(day);
 
-    if (cell.isToday) {
+    if (isToday) {
       cellWidgets[i].properties.color = 0xffffff;
       todayIdx = i;
       hasToday = true;
-    } else if (cell.isCurrentMonth) {
+    } else if (isCurrentMonth) {
       cellWidgets[i].properties.color = isWeekend ? WEEKEND_COLOR : TEXT_COLOR;
     } else {
       cellWidgets[i].properties.color = isWeekend ? 0x662222 : TEXT_COLOR_DIM;
@@ -250,8 +243,7 @@ Page(BasePage({
 
     createLayout();
 
-    const cells = computeCells(currentYear, currentMonth);
-    updateDisplay(currentYear, currentMonth, cells);
+    updateDisplay(currentYear, currentMonth);
 
     vis.log(`${getMonthName(currentMonth)} ${currentYear} loaded`);
     vis.refresh();
@@ -262,8 +254,7 @@ Page(BasePage({
     if (currentMonth > 11) { currentMonth = 0; currentYear++; }
     else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
 
-    const cells = computeCells(currentYear, currentMonth);
-    updateDisplay(currentYear, currentMonth, cells);
+    updateDisplay(currentYear, currentMonth);
     vis.info(`→ ${getMonthName(currentMonth)} ${currentYear}`);
     vis.refresh();
   },
@@ -272,8 +263,7 @@ Page(BasePage({
     const now = new Date();
     currentYear = now.getFullYear();
     currentMonth = now.getMonth();
-    const cells = computeCells(currentYear, currentMonth);
-    updateDisplay(currentYear, currentMonth, cells);
+    updateDisplay(currentYear, currentMonth);
     vis.info(`← Today: ${getMonthName(currentMonth)} ${currentYear}`);
     vis.refresh();
   },
